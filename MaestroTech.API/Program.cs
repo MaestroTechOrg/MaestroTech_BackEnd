@@ -1,3 +1,10 @@
+using MaestroTech.Infrastructure.Data;
+using MaestroTech.Infrastructure.Repositories;
+using MaestroTech.Domain.Repositories;
+using MaestroTech.Application.Services;
+using MaestroTech.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,7 +23,22 @@ builder.Services.AddScoped<IIgrejaRepository, IgrejaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IMusicaRepository, MusicaRepository>();
 builder.Services.AddScoped<ICultoRepository, CultoRepository>();
-builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
+
+// Obter configurações do Twilio e verificar nulidade
+string accountSid = builder.Configuration["Twilio:AccountSid"] 
+                    ?? throw new ArgumentNullException("Twilio:AccountSid");
+string authToken = builder.Configuration["Twilio:AuthToken"] 
+                   ?? throw new ArgumentNullException("Twilio:AuthToken");
+string fromNumber = builder.Configuration["Twilio:FromNumber"] 
+                    ?? throw new ArgumentNullException("Twilio:FromNumber");
+
+// Registrar o serviço de envio para WhatsApp
+builder.Services.AddScoped<IWhatsAppService, TwilioWhatsAppService>(provider => 
+    new TwilioWhatsAppService(
+        accountSid,
+        authToken,
+        fromNumber
+    ));
 
 var app = builder.Build();
 

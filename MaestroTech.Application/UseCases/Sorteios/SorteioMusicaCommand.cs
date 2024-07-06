@@ -1,4 +1,5 @@
 using MaestroTech.Domain.Repositories;
+using System.Threading.Tasks;
 
 namespace MaestroTech.Application.UseCases.Sorteios
 {
@@ -13,7 +14,8 @@ namespace MaestroTech.Application.UseCases.Sorteios
 
         public async Task Execute()
         {
-            // lógica de sorteio de músicas
+            // Adicione uma chamada await para tornar o método verdadeiramente assíncrono
+            await Task.CompletedTask;
         }
     }
 }

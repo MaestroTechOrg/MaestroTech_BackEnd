@@ -17,7 +17,7 @@ namespace MaestroTech.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // fiquem a vontade para adicionar configurações de entidades
+            // Configurações adicionais, se necessário
         }
     }
 }

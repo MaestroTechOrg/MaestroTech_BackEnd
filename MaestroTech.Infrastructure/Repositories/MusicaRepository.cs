@@ -2,6 +2,8 @@ using MaestroTech.Domain.Entities;
 using MaestroTech.Domain.Repositories;
 using MaestroTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MaestroTech.Infrastructure.Repositories
 {
@@ -14,7 +16,7 @@ namespace MaestroTech.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Musica> GetByIdAsync(int id)
+        public async Task<Musica?> GetByIdAsync(int id)
         {
             return await _context.Musicas.FindAsync(id);
         }
