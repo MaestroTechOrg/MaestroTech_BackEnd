@@ -7,10 +7,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure EF Core
+builder.Services.AddDbContext<MaestroTechDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Configure DI for services and repositories
 builder.Services.AddScoped<IIgrejaRepository, IgrejaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-// Add other services and repositories as needed
+builder.Services.AddScoped<IMusicaRepository, MusicaRepository>();
+builder.Services.AddScoped<ICultoRepository, CultoRepository>();
+builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
 
 var app = builder.Build();
 
@@ -27,10 +33,4 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
