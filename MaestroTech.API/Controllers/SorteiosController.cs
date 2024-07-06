@@ -6,7 +6,7 @@ namespace MaestroTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
     public class SorteiosController : ControllerBase
     {
         private readonly SorteioMusicaCommand _sorteioMusicaCommand;

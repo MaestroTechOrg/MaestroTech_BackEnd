@@ -7,7 +7,7 @@ namespace MaestroTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "AdminPolicy")]
+    // [Authorize(Policy = "AdminPolicy")]
     public class IgrejasController : ControllerBase
     {
         private readonly IIgrejaRepository _igrejaRepository;
