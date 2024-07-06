@@ -1,12 +1,14 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MaestroTech.Infrastructure.Data;
 using MaestroTech.Infrastructure.Repositories;
 using MaestroTech.Domain.Repositories;
 using MaestroTech.Application.Services;
 using MaestroTech.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
+using MaestroTech.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +21,20 @@ builder.Services.AddSwaggerGen();
 
 // Configure EF Core
 builder.Services.AddDbContext<MaestroTechDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), 
+        b => b.MigrationsAssembly("MaestroTech.API")));
+
+// Configure Identity
+builder.Services.AddIdentity<Usuario, IdentityRole<int>>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+})
+.AddEntityFrameworkStores<MaestroTechDbContext>()
+.AddDefaultTokenProviders();
 
 // Configure DI for services and repositories
 builder.Services.AddScoped<IIgrejaRepository, IgrejaRepository>();
@@ -70,7 +85,7 @@ builder.Services.AddAuthentication(options =>
 // Adicionar políticas de autorização
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Administrator"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Administrador"));
 });
 
 var app = builder.Build();
