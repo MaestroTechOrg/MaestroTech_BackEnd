@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MaestroTech.Infrastructure.Data;
 using MaestroTech.Infrastructure.Repositories;
 using MaestroTech.Domain.Repositories;
@@ -40,6 +43,36 @@ builder.Services.AddScoped<IWhatsAppService, TwilioWhatsAppService>(provider =>
         fromNumber
     ));
 
+// Obter a chave JWT e verificar nulidade
+string jwtKey = builder.Configuration["Jwt:Key"] 
+                ?? throw new ArgumentNullException("Jwt:Key");
+var key = Encoding.ASCII.GetBytes(jwtKey);
+
+// Configurar autenticação JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
+// Adicionar políticas de autorização
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Administrator"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,6 +86,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Adicionar middlewares de autenticação e autorização
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
