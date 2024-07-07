@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MaestroTech.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     // [Authorize(Policy = "AdminPolicy")]
     public class UsuariosController : ControllerBase

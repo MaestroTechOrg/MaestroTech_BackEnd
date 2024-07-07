@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +14,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-});
+builder.Services.AddControllers();
 
 // Configure Swagger
 builder.Services.AddSwaggerGen(c =>
@@ -36,11 +32,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     // Configurar segurança JWT
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header usando o esquema Bearer. \r\n\r\n" +
-                      "Digite 'Bearer' [espaço] e, em seguida, seu token na entrada de texto abaixo.\r\n\r\n" +
-                      "Exemplo: 'Bearer 12345abcdef'",
+        Description = "Digite seu token JWT diretamente.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -55,10 +49,10 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = "ApiKey"
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
+                Scheme = "Bearer",
+                Name = "Authorization",
                 In = ParameterLocation.Header,
             },
             new List<string>()

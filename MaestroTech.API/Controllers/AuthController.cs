@@ -1,70 +1,63 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using MaestroTech.Domain.Entities;
+using MaestroTech.Infrastructure.Data;
 using System.Security.Claims;
 
 namespace MaestroTech.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<Usuario> _userManager;
-        private readonly SignInManager<Usuario> _signInManager;
+        private readonly MaestroTechDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, IConfiguration configuration)
+        public AuthController(MaestroTechDbContext context, IConfiguration configuration)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _context = context;
             _configuration = configuration;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var user = new Usuario
+            var admin = new Admin
             {
-                UserName = model.Email,
-                Email = model.Email,
                 Nome = model.Nome,
-                Perfil = "Usuario"
+                Email = model.Email,
+                Senha = BCrypt.Net.BCrypt.HashPassword(model.Senha) // Usar hashing para senhas
             };
-            var result = await _userManager.CreateAsync(user, model.Senha);
-            if (result.Succeeded)
-            {
-                return Ok(new { Message = "User created successfully" });
-            }
-            return BadRequest(result.Errors);
+
+            _context.Admins.Add(admin);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Admin created successfully" });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Senha, false, false);
-            if (result.Succeeded)
+            var admin = await _context.Admins.SingleOrDefaultAsync(a => a.Email == model.Email);
+            if (admin == null || !BCrypt.Net.BCrypt.Verify(model.Senha, admin.Senha))
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
-                {
-                    return Unauthorized(new { Message = "Invalid login attempt." });
-                }
-                var token = GenerateJwtToken(user);
-                return Ok(new { Token = token });
+                return Unauthorized(new { Message = "Invalid login attempt." });
             }
-            return Unauthorized(new { Message = "Invalid login attempt." });
+
+            var token = GenerateJwtToken(admin);
+            return Ok(new { Token = token });
         }
 
-        private string GenerateJwtToken(Usuario user)
+        private string GenerateJwtToken(Admin admin)
         {
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Sub, admin.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, admin.Id.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key")));

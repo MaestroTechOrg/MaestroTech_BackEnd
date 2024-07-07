@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MaestroTech.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     // [Authorize]
     public class SorteiosController : ControllerBase

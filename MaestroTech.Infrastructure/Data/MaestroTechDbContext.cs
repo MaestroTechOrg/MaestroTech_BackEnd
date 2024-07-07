@@ -13,6 +13,7 @@ namespace MaestroTech.Infrastructure.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Musica> Musicas { get; set; }
         public DbSet<Culto> Cultos { get; set; }
+        public DbSet<Admin> Admins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
