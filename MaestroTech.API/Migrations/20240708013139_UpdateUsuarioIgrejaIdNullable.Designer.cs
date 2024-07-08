@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaestroTech.API.Migrations
 {
     [DbContext(typeof(MaestroTechDbContext))]
-    [Migration("20240706220331_InitialSetup")]
-    partial class InitialSetup
+    [Migration("20240708013139_UpdateUsuarioIgrejaIdNullable")]
+    partial class UpdateUsuarioIgrejaIdNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,7 +124,7 @@ namespace MaestroTech.API.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("IgrejaId")
+                    b.Property<int?>("IgrejaId")
                         .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
@@ -134,6 +134,7 @@ namespace MaestroTech.API.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Nome")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -196,9 +197,7 @@ namespace MaestroTech.API.Migrations
                 {
                     b.HasOne("MaestroTech.Domain.Entities.Igreja", "Igreja")
                         .WithMany("Usuarios")
-                        .HasForeignKey("IgrejaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IgrejaId");
 
                     b.Navigation("Igreja");
                 });
