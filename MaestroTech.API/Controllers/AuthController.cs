@@ -54,7 +54,7 @@ namespace MaestroTech.API.Controllers
                     return Unauthorized(new { Message = "Invalid login attempt." });
                 }
                 var token = GenerateJwtToken(user);
-                return Ok(new { Token = token });
+                return Ok(new Dictionary<string, object> { { "token", token } });
             }
             return Unauthorized(new { Message = "Invalid login attempt." });
         }
