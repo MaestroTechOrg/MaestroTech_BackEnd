@@ -1,8 +1,5 @@
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using MaestroTech.Infrastructure.Data;
 using MaestroTech.Infrastructure.Repositories;
 using MaestroTech.Domain.Repositories;
@@ -28,34 +25,6 @@ builder.Services.AddSwaggerGen(c =>
         {
             Name = "MaestroTech",
             Email = "contato@maestrotech.org"
-        }
-    });
-
-    // Configurar segurança JWT
-    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
-    {
-        Description = "Digite seu token JWT diretamente.",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "ApiKey"
-                },
-                Scheme = "Bearer",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-            },
-            new List<string>()
         }
     });
 });
@@ -99,36 +68,6 @@ builder.Services.AddScoped<IWhatsAppService, TwilioWhatsAppService>(provider =>
         fromNumber
     ));
 
-// Obter a chave JWT e verificar nulidade
-string jwtKey = builder.Configuration["Jwt:Key"] 
-                ?? throw new ArgumentNullException("Jwt:Key");
-var key = Encoding.ASCII.GetBytes(jwtKey);
-
-// Configurar autenticação JWT
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
-    };
-});
-
-// Adicionar políticas de autorização
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Administrador"));
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -145,10 +84,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-// Adicionar middlewares de autenticação e autorização
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 
