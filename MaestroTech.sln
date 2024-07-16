@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -10,6 +9,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaestroTech.Application", "MaestroTech.Application\MaestroTech.Application.csproj", "{6F3D6B98-6E2E-4B45-8538-6485F30D3378}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaestroTech.Infrastructure", "MaestroTech.Infrastructure\MaestroTech.Infrastructure.csproj", "{3733E904-1481-42EB-8C7A-78BC2C271E20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaestroTech.Tests", "MaestroTech.Tests\MaestroTech.Tests.csproj", "{NEW_GUID_HERE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +37,9 @@ Global
 		{3733E904-1481-42EB-8C7A-78BC2C271E20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3733E904-1481-42EB-8C7A-78BC2C271E20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3733E904-1481-42EB-8C7A-78BC2C271E20}.Release|Any CPU.Build.0 = Release|Any CPU
+        {NEW_GUID_HERE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {NEW_GUID_HERE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {NEW_GUID_HERE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {NEW_GUID_HERE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
