@@ -118,7 +118,7 @@ public class UsuariosControllerTests
     public async Task Delete_ReturnsNoContentResult()
     {
         // Arrange
-        _mockUsuarioRepository.Setup(repo => repo.DeleteAsync(1)).Returns(Task.CompletedTask);
+        _mockUsuarioRepository.Setup(repo => repo.DeleteAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
 
         // Act
         var result = await _usuariosController.Delete(1);

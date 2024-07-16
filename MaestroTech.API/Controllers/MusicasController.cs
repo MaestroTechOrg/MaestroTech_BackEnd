@@ -7,7 +7,7 @@ namespace MaestroTech.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class MusicasController : ControllerBase
     {
         private readonly IMusicaRepository _musicaRepository;

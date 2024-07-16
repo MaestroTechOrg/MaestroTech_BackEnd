@@ -10,6 +10,10 @@ using Xunit;
 using MaestroTech.API.Controllers;
 using MaestroTech.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Linq;
+using System.Text; 
 
 public class AuthControllerTests
 {
@@ -44,6 +48,7 @@ public class AuthControllerTests
 
         _mockConfiguration = new Mock<IConfiguration>();
 
+        // Usar uma chave JWT com pelo menos 256 bits (32 caracteres)
         _mockConfiguration.Setup(config => config["Jwt:Key"]).Returns("o@kUq$&NfGZM1ES!LK26MFD$kRl8N1zk");
         _mockConfiguration.Setup(config => config["Jwt:Issuer"]).Returns("MaestroTechAPI");
 
@@ -96,13 +101,42 @@ public class AuthControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(200, okResult.StatusCode);
 
+        // Verifique se a resposta é um dicionário de string para objeto
         var tokenResult = okResult.Value as IDictionary<string, object>;
-        Assert.NotNull(tokenResult);
+        Assert.NotNull(tokenResult); // Verifica se a resposta não é nula
 
+        // Verifique se contém a chave "token"
         Assert.True(tokenResult.ContainsKey("token"));
 
         var token = tokenResult["token"] as string;
-        Assert.NotNull(token);
+        Assert.NotNull(token); // Verifique se o token não é nulo
+
+        // Validate the token
+        var handler = new JwtSecurityTokenHandler();
+        SecurityToken validatedToken;
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = _mockConfiguration.Object["Jwt:Issuer"],
+            ValidAudience = _mockConfiguration.Object["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_mockConfiguration.Object["Jwt:Key"]))
+        };
+
+        var principal = handler.ValidateToken(token, validationParameters, out validatedToken);
+
+        var jwtToken = validatedToken as JwtSecurityToken;
+        Assert.NotNull(jwtToken); // Verifique se o token JWT não é nulo
+
+        var expClaim = jwtToken?.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Exp);
+        Assert.NotNull(expClaim); // Verifique se o token tem a reivindicação de expiração
+
+        var expValue = long.Parse(expClaim?.Value ?? "0");
+        var expDate = DateTimeOffset.FromUnixTimeSeconds(expValue).UtcDateTime;
+
+        Assert.True(expDate > DateTime.UtcNow); // Verifique se a data de expiração é no futuro
     }
 
     [Fact]

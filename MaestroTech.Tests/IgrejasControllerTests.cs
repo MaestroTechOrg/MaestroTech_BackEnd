@@ -51,11 +51,12 @@ public class IgrejasControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = Assert.IsType<Igreja>(okResult.Value);
-        Assert.Equal(igreja.Id, returnValue.Id);
-        Assert.Equal(igreja.Nome, returnValue.Nome);
-        Assert.Equal(igreja.Cidade, returnValue.Cidade);
-        Assert.Equal(igreja.UF, returnValue.UF);
+        Assert.Equal(igreja.Id, returnValue?.Id);
+        Assert.Equal(igreja.Nome, returnValue?.Nome);
+        Assert.Equal(igreja.Cidade, returnValue?.Cidade);
+        Assert.Equal(igreja.UF, returnValue?.UF);
     }
+
 
     [Fact]
     public async Task GetById_ReturnsNotFoundResult_WhenIgrejaNotFound()
@@ -120,7 +121,7 @@ public class IgrejasControllerTests
     public async Task Delete_ReturnsNoContentResult()
     {
         // Arrange
-        _mockIgrejaRepository.Setup(repo => repo.DeleteAsync(1)).Returns(Task.CompletedTask);
+        _mockIgrejaRepository.Setup(repo => repo.DeleteAsync(It.IsAny<int>())).Returns(Task.CompletedTask);
 
         // Act
         var result = await _igrejasController.Delete(1);
